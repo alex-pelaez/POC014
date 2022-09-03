@@ -9,10 +9,21 @@ import android.os.Bundle
 import android.os.ParcelUuid
 import java.util.*
 import java.util.regex.Pattern
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ListView
 
 private const val SELECT_DEVICE_REQUEST_CODE = 0
 
 class MainActivity : AppCompatActivity() {
+    lateinit var editText: EditText
+    lateinit var button: Button
+    lateinit var btnScan: Button
+    lateinit var btnList: Button
+    lateinit var listView: ListView
+    var list: ArrayList<String> = ArrayList()
+    lateinit var arrayAdapter: ArrayAdapter<String>
 
     private val deviceManager: CompanionDeviceManager by lazy {
         getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
@@ -22,41 +33,66 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // To skip filters based on names and supported feature flags (UUIDs),
-        // omit calls to setNamePattern() and addServiceUuid()
-        // respectively, as shown in the following  Bluetooth example.
-        val deviceFilter: BluetoothDeviceFilter = BluetoothDeviceFilter.Builder()
-            .setNamePattern(Pattern.compile("Jabra"))
-            //.addServiceUuid(ParcelUuid(UUID(0x123abcL, -1L)), null)
-            .build()
+        // Prepare UI
+        title = "Kotlin"
+        listView = findViewById(R.id.listView)
+        editText = findViewById(R.id.editText)
+        button = findViewById(R.id.btnAdd)
+        btnList = findViewById(R.id.btnList)
+        btnScan = findViewById(R.id.btnScan)
+        arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+        button.setOnClickListener {
+            list.add(editText.text.toString())
+            editText.setText("")
+            arrayAdapter.notifyDataSetChanged()
+            listView.adapter = arrayAdapter
+        }
 
-        // The argument provided in setSingleDevice() determines whether a single
-        // device name or a list of them appears.
-        val pairingRequest: AssociationRequest = AssociationRequest.Builder()
-            .addDeviceFilter(deviceFilter)
-            .setSingleDevice(true)
-            .build()
+        btnScan.setOnClickListener {
+            // To skip filters based on names and supported feature flags (UUIDs),
+            // omit calls to setNamePattern() and addServiceUuid()
+            // respectively, as shown in the following  Bluetooth example.
+            val deviceFilter: BluetoothDeviceFilter = BluetoothDeviceFilter.Builder()
+                //.setNamePattern(Pattern.compile("Jabra"))
+                //.addServiceUuid(ParcelUuid(UUID(0x123abcL, -1L)), null)
+                .build()
 
-        // When the app tries to pair with a Bluetooth device, show the
-        // corresponding dialog box to the user.
-        deviceManager.associate(pairingRequest,
-            object : CompanionDeviceManager.Callback() {
+            // The argument provided in setSingleDevice() determines whether a single
+            // device name or a list of them appears.
+            val pairingRequest: AssociationRequest = AssociationRequest.Builder()
+                .addDeviceFilter(deviceFilter)
+                .setSingleDevice(false)
+                .build()
 
-                override fun onDeviceFound(chooserLauncher: IntentSender) {
-                    startIntentSenderForResult(chooserLauncher,
-                        SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0)
-                }
+            // When the app tries to pair with a Bluetooth device, show the
+            // corresponding dialog box to the user.
+            deviceManager.associate(pairingRequest,
+                object : CompanionDeviceManager.Callback() {
 
-                override fun onFailure(error: CharSequence?) {
-                    val objectAux  = 0
-                }
-            }, null)
+                    override fun onDeviceFound(chooserLauncher: IntentSender) {
+                        startIntentSenderForResult(chooserLauncher,
+                            SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0)
+                    }
+
+                    override fun onFailure(error: CharSequence?) {
+                        val objectAux  = 0
+                    }
+                }, null)
+        }
+
+        btnList.setOnClickListener {
+            deviceManager.getAssociations().forEach { list.add(it) }
+            arrayAdapter.notifyDataSetChanged()
+            listView.adapter = arrayAdapter
+
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             SELECT_DEVICE_REQUEST_CODE -> when(resultCode) {
                 Activity.RESULT_OK -> {
+                    //list.add("New")
                     // The user chose to pair the app with a Bluetooth device.
                     val deviceToPair: BluetoothDevice? =
                         data?.getParcelableExtra(CompanionDeviceManager.EXTRA_DEVICE)
