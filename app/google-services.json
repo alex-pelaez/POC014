@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "593500557801",
+    "project_id": "aparkat",
+    "storage_bucket": "aparkat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593500557801:android:d66d377ae696131ad57b78",
+        "android_client_info": {
+          "package_name": "app.aparkat.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "593500557801-05skc0cbio44vpkgf5daoh0in0j23vpp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBu-kFV_ZbMp-kVibPCX_ziSntlpj46Oq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "593500557801-05skc0cbio44vpkgf5daoh0in0j23vpp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
