@@ -20,7 +20,7 @@ private const val TAG = "AparkatBluetoothBroadcastReceiver"
 class AparkatBluetoothReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        StringBuilder().apply {
+ /*       StringBuilder().apply {
             append("Action: ${intent.action}\n")
             append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
             toString().also { log ->
@@ -36,7 +36,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                     val aux = "[response bytes] ${String(bytes)}".toString()
                     Log.d(TAG, aux)
                 }
-            }
+            }*/
 
         //DB
         // Access a Cloud Firestore instance from your Activity
@@ -60,7 +60,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                 Log.w(TAG, "Error adding document", e)
             }
 
-
+/*
         // Get all records
         db.collection("ParkingSlot")
             .get()
@@ -71,7 +71,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
-            }
+            }*/
     }
 
     fun Query.getNearestLocation(latitude: Double, longitude: Double, distance: Double): Query {
