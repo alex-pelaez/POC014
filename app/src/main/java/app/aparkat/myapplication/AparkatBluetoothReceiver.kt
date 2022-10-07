@@ -98,7 +98,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                     db.collection("ParkingSlot")
                         .add(currentPosition)
                         .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id} " + currentLocation!!.latitude + " - " + currentLocation!!.longitude)
                         }
                         .addOnFailureListener { e ->
                             Log.w(TAG, "Error adding document", e)
@@ -109,6 +109,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
             }
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+
 
         //DB
         // Access a Cloud Firestore instance from your Activity
@@ -123,7 +124,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
         )
 
         // Add a new document with a generated ID
-        db.collection("ParkingSlot")
+        db.collection("ParkingSlot2")
             .add(currentPosition)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
@@ -131,6 +132,8 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding document", e)
             }
+
+
 
 
 
