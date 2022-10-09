@@ -38,7 +38,17 @@ private var currentLocation: Location? = null
 class AparkatBluetoothReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
- /*       StringBuilder().apply {
+        //DB
+        // Access a Cloud Firestore instance from your Activity
+        val dbTrace = Firebase.firestore
+
+        val action = intent.action
+
+        val device = intent.extras.toString()
+
+        Log.i(TAG, action + " " + device)
+
+/*        StringBuilder().apply {
             append("Action: ${intent.action}\n")
             append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
             toString().also { log ->
@@ -67,7 +77,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
             // Sets the fastest rate for active location updates.
             // This interval is exact, and your application will never
             // receive updates more frequently than this value
-            fastestInterval = TimeUnit.SECONDS.toMillis(30)
+            fastestInterval = TimeUnit.SECONDS.toMillis(5)
 
             // Sets the maximum time when batched location
             // updates are delivered. Updates may be
@@ -80,8 +90,18 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
+
+                Log.d(TAG, "Getting location and stopping updates")
+
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+
                 locationResult.lastLocation?.let {
+                    Log.d(TAG, "Getting location result...")
+
                     currentLocation  = locationResult.lastLocation
+
+                    Log.d(TAG, "Location result:" + currentLocation!!.latitude + ", " + currentLocation!!.longitude)
+
                     //DB
                     // Access a Cloud Firestore instance from your Activity
                     val db = Firebase.firestore
@@ -89,7 +109,7 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                     // Get Current Position
                     val currentPosition = hashMapOf(
                         "location" to GeoPoint(currentLocation!!.latitude, currentLocation!!.longitude),
-                        "type" to "Medium",
+                        "type" to context.toString(),
                         "user" to "user02",
                         "timestamp" to DateTimeFormatter.ISO_INSTANT.format(Instant.now())
                     )
@@ -109,35 +129,6 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
             }
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
-
-
-        //DB
-        // Access a Cloud Firestore instance from your Activity
-        val db = Firebase.firestore
-
-        // Get Current Position
-        val currentPosition = hashMapOf(
-            "location" to GeoPoint(41.0, 5.0),
-            "type" to "Medium",
-            "user" to "user02",
-            "timestamp" to DateTimeFormatter.ISO_INSTANT.format(Instant.now())
-        )
-
-        // Add a new document with a generated ID
-        db.collection("ParkingSlot2")
-            .add(currentPosition)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding document", e)
-            }
-
-
-
-
-
-
 
 /*
         // Get all records
