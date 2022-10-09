@@ -56,15 +56,15 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                 Toast.makeText(context, log, Toast.LENGTH_LONG).show()
 
             }
-        }
+        }*/
         Fuel.get("https://hello-uun4mb7fqq-no.a.run.app")
             .response { request, response, result ->
                 val (bytes, error) = result
                 if (bytes != null) {
                     val aux = "[response bytes] ${String(bytes)}".toString()
-                    Log.d(TAG, aux)
+                    Log.d(TAG, "Response size: " + aux.length)
                 }
-            }*/
+            }
 
         // Get current position
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
