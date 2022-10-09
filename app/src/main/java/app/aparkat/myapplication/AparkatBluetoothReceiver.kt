@@ -9,6 +9,9 @@ import android.widget.Toast
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
@@ -128,8 +131,47 @@ class AparkatBluetoothReceiver : BroadcastReceiver() {
                 }
             }
         }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
 
+        //Low accuracy
+        //fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+
+        // Not works due throttling https://stackoverflow.com/questions/66170979/fusedlocationproviderclient-getcurrentlocation-background-apps-calling-this-m
+        fusedLocationProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+
+            override fun isCancellationRequested() = false
+        })
+            .addOnSuccessListener { location: Location? ->
+                if (location == null)
+                    Log.e(TAG,"Cannot get location.")
+                else {
+                    val lat = location.latitude
+                    val lon = location.longitude
+
+                    //DB
+                    // Access a Cloud Firestore instance from your Activity
+                    val db = Firebase.firestore
+
+                    // Get Current Position
+                    val currentPosition = hashMapOf(
+                        "location" to GeoPoint(lat, lon),
+                        "type" to context.toString(),
+                        "user" to "user02",
+                        "timestamp" to DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                    )
+
+                    // Add a new document with a generated ID
+                    db.collection("ParkingSlot")
+                        .add(currentPosition)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id} " + currentLocation!!.latitude + " - " + currentLocation!!.longitude)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error adding document", e)
+                        }
+                }
+
+            }
 /*
         // Get all records
         db.collection("ParkingSlot")
